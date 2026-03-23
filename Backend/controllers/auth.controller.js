@@ -1,6 +1,9 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/user.model.js";
+import { generateAccessToken } from "../config/token.config.js";
 
+
+//^ register user
 export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
   let existingUser = await User.findOne(username);
@@ -8,14 +11,19 @@ export const registerUser = asyncHandler(async (req, res) => {
   if (!existingUser)
     return res.status(400).json({ message: "User already exist" });
 
+  let assessToken = generateAccessToken(user._id);
+  res.cookie("accessToken", assessToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    maxAge: 1000 * 60 * 15, // 15 minutes in milliseconds
+  });
   let user = await User.create({
     username,
     email,
     password,
   });
-
   if (!user) return res.status(400).json({ message: "User not added" });
-
   res.status(201).json({
     statusCode: 201,
     message: "user added successfully",
@@ -24,26 +32,24 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 
+//^ login user
 export const loginUser = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  let user = await User.findOne({ username });
+  let user = await User.findOne({ email });
 
   if (!user) return res.status(400).json({ message: "User not found" });
 
   if (user.password !== password)
     return res.status(400).json({ message: "Invalid password" });
 
-  let token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  let assessToken = generateAccessToken(user._id);
 
-  res.cookie("token", token, {
+  res.cookie("accessToken", assessToken, {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: "strict",
-    maxAge: 1000 * 60 * 60, // 1 hour in millisecondss
+    maxAge: 1000 * 60 * 15, // 15 minutes in milliseconds
   });
-
   res.status(200).json({ message: "User logged in successfully" });
 });

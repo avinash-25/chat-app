@@ -9,6 +9,9 @@ connectDB();
 
 app.use(express.json());
 
+app.use("/api/auth", authRoutes);
+
+
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", message: "Server is working" });
 });
