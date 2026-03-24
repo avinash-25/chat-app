@@ -1,2 +1,16 @@
 Notes
 .DS_Store
+Dummy
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.zip
+*.tar.gz
+*.7z
+*.exe
+*.dll
+*.so
+*.dylib
+*.pyc

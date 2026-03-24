@@ -1,16 +1,18 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/user.model.js";
 import { generateAccessToken } from "../config/token.config.js";
+import { compare } from "bcryptjs";
 
 //^ register user
 export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
-  let existingUser = await User.findOne(username);
 
-  if (!existingUser)
+  let existingUser = await User.findOne({ username });
+
+  if (existingUser)
     return res.status(400).json({ message: "User already exist" });
 
-  let assessToken = generateAccessToken(user._id);
+  let assessToken = generateAccessToken(User._id);
   res.cookie("accessToken", assessToken, {
     httpOnly: true,
     secure: false,
@@ -38,10 +40,11 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   if (!user) return res.status(400).json({ message: "User not found" });
 
-  if (user.password !== password)
-    return res.status(400).json({ message: "Invalid password" });
+  let isMatch = await compare(password, user.password);
 
-  let assessToken = generateAccessToken(user._id);
+  if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+  let assessToken = generateAccessToken(User._id);
 
   res.cookie("accessToken", assessToken, {
     httpOnly: true,
@@ -56,9 +59,23 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 export const logoutUser = asyncHandler(async (req, res) => {
   res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: false,
-    sameSite: "strict",
+    httpOnly: true, // Set httpOnly to true to prevent client-side access to the cookie
+    secure: false, // Set secure to true if using HTTPS
+    sameSite: "strict", //  Set sameSite to 'strict' or 'lax' based on your requirements
   });
   res.status(200).json({ message: "User logged out successfully" });
+});
+
+//^ Update user profile
+export const updateUserProfile = asyncHandler(async (req, res) => {
+  const { name, username, email } = req.body;
+  const userId = req.user._id;
+
+  let user = await User.findById(userId);
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  user.name = name || user.name;
+  user.username = username || user.username;
+  user.email = email || user.email;
 });
