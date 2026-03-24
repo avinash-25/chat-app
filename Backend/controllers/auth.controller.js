@@ -2,7 +2,6 @@ import asyncHandler from "express-async-handler";
 import User from "../models/user.model.js";
 import { generateAccessToken } from "../config/token.config.js";
 
-
 //^ register user
 export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
@@ -31,7 +30,6 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
 });
 
-
 //^ login user
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -52,4 +50,15 @@ export const loginUser = asyncHandler(async (req, res) => {
     maxAge: 1000 * 60 * 15, // 15 minutes in milliseconds
   });
   res.status(200).json({ message: "User logged in successfully" });
+});
+
+//^ logout user
+
+export const logoutUser = asyncHandler(async (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+  });
+  res.status(200).json({ message: "User logged out successfully" });
 });
