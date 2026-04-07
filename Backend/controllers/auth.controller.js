@@ -42,11 +42,11 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   let isMatch = await compare(password, user.password);
 
-  if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+  if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
-  let assessToken = generateAccessToken(User._id);
+  let accessToken = generateAccessToken(user._id);
 
-  res.cookie("accessToken", assessToken, {
+  res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: false,
     sameSite: "strict",
