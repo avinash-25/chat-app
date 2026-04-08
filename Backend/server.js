@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import userRouter from "./routes/user.routes.js";
 
 dotenv.config({ quiet: true });
 
@@ -21,6 +22,7 @@ app.use(express.json()); // Middleware to parse JSON request bodies
 app.use(cookieParser()); // Middleware to parse cookies
 
 app.use("/api/auth", authRoutes);
+app.use("api/user", userRouter);
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", message: "Server is working" });
