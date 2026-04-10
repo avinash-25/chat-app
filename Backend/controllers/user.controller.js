@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/user.model.js";
 
+//* Get single user
 export const getCurrentUser = asyncHandler(async (req, res) => {
   let userId = req.userId;
 
@@ -14,3 +15,5 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
     user: user,
   });
 });
+
+//*
